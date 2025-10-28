@@ -117,9 +117,6 @@ def download_reels(message: telebot.types.Message):
         except instaloader.exceptions.BadResponseException as e:
             logger.warning(f"User {user_id} tried to download private reels: {e}")
             bot.send_message(message.chat.id, "It's private reels, i cant download it")
-        except Exception as e:
-            logger.error(f"Error downloading reels for user {user_id}: {e}")
-            bot.send_message(message.chat.id, "An error occurred while downloading reels")
 
 # | ADMIN COMMANDS |
 
