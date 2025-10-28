@@ -1,9 +1,10 @@
 import re
 
-def instagram_url(url: str) -> bool:
-    pattern = r"https?:\/\/(www\.)?instagram\.com\/reels\/[A-Za-z0-9_-]+\/?$"
+def get_shortcode_from_url(url: str) -> str | None:
 
-    return  (re.fullmatch(pattern, url) is not None)
+    pattern = r"https?://(?:www\.)?instagram\.com/(?:[A-Za-z0-9._%-]+/)?(reel|reels|p)/([A-Za-z0-9_-]+)(?:/)?(?:\?.*)?$"
 
-
-## fullmatch return MATCH OBJECT if url == pattern and NONE if url != pattern
+    match = re.match(pattern, url)
+    if match:
+        return match.group(2)
+    return None

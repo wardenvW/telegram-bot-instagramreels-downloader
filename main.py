@@ -8,7 +8,7 @@ from datetime import datetime
 
 from db.database import get_all_users, block_user, unblock_user, find_user, add_admin, delete_admin
 from db.initialization import init_database
-from validators import instagram_url
+from validators import get_shortcode_from_url
 from tempfile import TemporaryDirectory
 from pathlib import Path
 from decorators import user, admin, s_admin
@@ -78,16 +78,14 @@ def download_reels(message: telebot.types.Message):
     url = message.text
     logger.info(f"User {user_id} provided URL: {url}")
 
-    if not instagram_url(url):
+    shortcode = get_shortcode_from_url(url)
+    if not shortcode:
         logger.warning(f"User {user_id} provided invalid URL: {url}")
         msg = bot.reply_to(message, 'Its not valid url, try again')
         bot.register_next_step_handler(msg, download_reels)
         return
     
-    if url[-1] == '/':
-        shortcode = url.split("reels/")[-1][:-1]
-    else:
-        shortcode = url.split("reels/")[-1]
+    
     
     logger.info(f"User {user_id} downloading reels with shortcode: {shortcode}")
     
