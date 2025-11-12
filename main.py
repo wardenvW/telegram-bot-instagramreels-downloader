@@ -328,6 +328,13 @@ def process_delete_admin(message: telebot.types.Message):
 def index():
     return jsonify({"status": "Bot is running", "service": "Instagram reels Telegram Bot loader"})
 
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    json_string = request.get_data().decode('utf-8')
+    update = telebot.types.Update.de_json(json_string)
+    
+    bot.process_new_updates([update])
+    return ''
 
 if __name__ == "__main__":
     '''
