@@ -354,8 +354,6 @@ if __name__ == "__main__":
     bot.load_next_step_handlers()
     logger.info("Bot step handlers loaded!")
 
-    bot.set_webhook(url=f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
-
     port = int(os.environ.get('PORT', 5000))
     
     logger.info(f"Starting server on port {port}")
