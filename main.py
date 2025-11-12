@@ -5,6 +5,7 @@ import instaloader
 import json
 import sys
 from datetime import datetime
+from flask import Flask, request, jsonify
 
 from db.database import get_all_users, block_user, unblock_user, find_user, add_admin, delete_admin
 from db.initialization import init_database
@@ -44,10 +45,13 @@ telebot.logger.setLevel(logging.WARNING)
 load_dotenv()
 
 API_TOKEN = os.getenv('API_TOKEN')
+WEBHOOK_URL = os.getenv('WEBHOOK_URL')
+
 if not API_TOKEN:
     logger.error("API_TOKEN not found in environment variables!")
     sys.exit(1)
 
+app = Flask(__name__)   
 bot = telebot.TeleBot(API_TOKEN)
 logger.info("Bot initialized")
 
@@ -320,10 +324,14 @@ def process_delete_admin(message: telebot.types.Message):
         logger.info(f"Super admin {admin_id} failed to remove admin rights from user {user_id} (not found or not admin)")
         bot.send_message(message.chat.id, "❌ Admin not found")
 
+@app.route('/')
+def index():
+    return jsonify({"status": "Bot is running", "service": "Instagram reels Telegram Bot loader"})
+
 
 if __name__ == "__main__":
-    logger.info("Starting bot...")
-    try:
+    '''
+    # logger.info("Starting bot...")try:
         bot.enable_save_next_step_handlers(delay=1)
         bot.load_next_step_handlers()
         logger.info("Bot handlers loaded, starting polling...")
@@ -331,3 +339,17 @@ if __name__ == "__main__":
     except Exception as e:
         logger.critical(f"Bot crashed: {e}")
         sys.exit(1)
+    '''
+
+    logger.info("Starting Flask app...")
+
+    bot.enable_save_next_step_handlers(delay=1)
+    bot.load_next_step_handlers()
+    logger.info("Bot step handlers loaded!")
+
+    bot.set_webhook(url=f"{WEBHOOK_URL}/webhook", drop_pending_updates=True)
+
+    port = int(os.environ.get('PORT', 5000))
+    
+    logger.info(f"Starting server on port {port}")
+    app.run(host='0.0.0.0', port=port)
